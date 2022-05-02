@@ -7,11 +7,11 @@
     <!-- Offset the base by half the lenght of the cylinder -->
     <pose>0 0 0.029335 0 0 0</pose>
     <inertial>
-      <mass>1.2</mass>
+      <mass>12</mass>
       <inertia>
-        <ixx>0.001087473</ixx>
-        <iyy>0.001087473</iyy>
-        <izz>0.001092437</izz>
+        <ixx>0.01087473</ixx>
+        <iyy>0.01087473</iyy>
+        <izz>0.01092437</izz>
         <ixy>0</ixy>
         <ixz>0</ixz>
         <iyz>0</iyz>
@@ -51,8 +51,8 @@
       <!-- Position the ray sensor based on the specification. Also rotate
            it by 90 degrees around the X-axis so that the <horizontal> rays
            become vertical -->
-      <pose>0 0 -0.004645 1.5707 0 0</pose>
-
+      <!--<pose>0 0 -0.004645 1.5707 0 0</pose>-->
+		<pose>0 0 -0.004645 1.5707 0 1.5707</pose>
       <!-- Enable visualization to see the rays in the GUI -->
       <visualize>true</visualize>
 
@@ -121,13 +121,14 @@
 
     <!-- Vertically offset the top cylinder by the length of the bottom
         cylinder and half the length of this cylinder. -->
+    <!--<pose>0 0 0.095455 0 0 0</pose>-->
     <pose>0 0 0.095455 0 0 0</pose>
     <inertial>
       <mass>0.1</mass>
       <inertia>
-        <ixx>0.000090623</ixx>
-        <iyy>0.000090623</iyy>
-        <izz>0.000091036</izz>
+        <ixx>0.0090623</ixx>
+        <iyy>0.0090623</iyy>
+        <izz>0.0091036</izz>
         <ixy>0</ixy>
         <ixz>0</ixz>
         <iyz>0</iyz>
@@ -138,8 +139,8 @@
       <geometry>
         <cylinder>
           
-          <radius>0.04267</radius>
-          <length>0.07357</length>
+          <radius>0.0004267</radius>
+          <length>0.0007357</length>
         </cylinder>
       </geometry>
     </collision>
@@ -147,7 +148,8 @@
     <!-- The visual is mostly a copy of the collision -->
     <visual name="top_visual">
       <!-- Lower the mesh by half the height, and rotate by 90 degrees -->
-      <pose>0 0 -0.0376785 0 0 1.5707</pose>
+      <!--<pose>0 0 -0.0376785 0 0 1.5707</pose> -->
+      <pose>0 0 -0.0376785 0 0 3.1415926535897932384626433832795</pose>
       <geometry>
         <!-- The mesh tag indicates that we will use a 3D mesh as
              a visual -->
@@ -161,7 +163,8 @@
     </visual>
   </link>
 
-  <joint type="revolute" name="elevation_joint">
+  
+  <joint type="universal" name="elevation_joint">
 
     <!-- Position the joint at the bottom of the top link -->
     <pose>0 0 -0.036785 0 0 0</pose>
@@ -176,42 +179,30 @@
     <axis>
 
       <!-- Revolve around the z-axis -->
+      <xyz>1 0 0</xyz>
+
+      <!-- Limit refers to the range of motion of the joint -->
+      <limit>
+
+        <!-- Use a very large number to indicate a continuous revolution -->
+        <lower>-1.57</lower>
+        <upper>1.57</upper>
+      </limit>
+    </axis>
+    <axis2>
+
+      <!-- Revolve around the z-axis -->
       <xyz>0 0 1</xyz>
 
       <!-- Limit refers to the range of motion of the joint -->
       <limit>
 
         <!-- Use a very large number to indicate a continuous revolution -->
-        <lower>-10000000000000000</lower>
-        <upper>10000000000000000</upper>
+        <lower>-1.57</lower>
+        <upper>1.57</upper>
       </limit>
-    </axis>
+    </axis2>
   </joint>
-  <joint type="revolute" name="Azimuth_joint">
 
-    <!-- Position the joint at the mid of the top link -->
-    <pose>0 0 0 0 0 0</pose>
-
-    <!-- Use the base link as the parent of the joint -->
-    <parent>base</parent>
-
-    <!-- Use the top link as the child of the joint -->
-    <child>top</child>
-
-    <!-- The axis defines the joint's degree of freedom -->
-    <axis>
-
-      <!-- Revolve around the z-axis -->
-      <xyz>0 1 0</xyz>
-
-      <!-- Limit refers to the range of motion of the joint -->
-      <limit>
-
-        <!-- Use a very large number to indicate a continuous revolution -->
-        <lower>-10000000000000000</lower>
-        <upper>10000000000000000</upper>
-      </limit>
-    </axis>
-  </joint>
 </model>
 </sdf>

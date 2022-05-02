@@ -3,7 +3,14 @@
 
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
-
+#include <gazebo/transport/transport.hh>
+#include <gazebo/msgs/msgs.hh>
+#include <thread>
+#include "ros/ros.h"
+#include "ros/callback_queue.h"
+#include "ros/subscribe_options.h"
+#include "std_msgs/Float32.h"
+#include "std_msgs/Float32MultiArray.h"
 namespace gazebo
 {
   /// \brief A plugin to control a Velodyne sensor.
@@ -19,54 +26,139 @@ namespace gazebo
     /// \param[in] _sdf A pointer to the plugin's SDF element.
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     {
-    
-	  // Safety check
-	  if (_model->GetJointCount() == 0)
-	  {
-		std::cerr << "Invalid joint count, Velodyne plugin not loaded\n";
-		return;
-	  }
+      // Safety check
+      if (_model->GetJointCount() == 0)
+      {
+        std::cerr << "Invalid joint count, Velodyne plugin not loaded\n";
+        return;
+      }
 
-	  // Store the model pointer for convenience.
-	  this->model = _model;
+      // Store the model pointer for convenience.
+      this->model = _model;
 
-	  // Get the first joint. We are making an assumption about the model
-	  // having one joint that is the rotational joint.
-	  this->joint1 = _model->GetJoints()[0];
-	  this->joint2 = _model->GetJoints()[1];
-	  // Setup a P-controller, with a gain of 0.1.
-	  //this->pid = common::PID(.0001, 0, 0.5);
+      // Get the first joint. We are making an assumption about the model
+      // having one joint that is the rotational joint.
+      std::cout<<"0,size of vecotr "<< (_model->GetJoints()).size()<<"get joint count"<<_model->GetJointCount()<<"\n";
+      this->joint = _model->GetJoints()[0];
+	  std::cout<<"1\n";
+      // Setup a P-controller, with a gain of 0.1.
+      this->pid = common::PID(0.05, 0, 0.04);
 
-	  // Apply the P-controller to the joint.
+      // Apply the P-controller to the joint.
+      this->model->GetJointController()->SetPositionPID(
+          this->joint->GetScopedName(), this->pid);
 
-	  //this->model->GetJointController()->SetPositionPID(
-	//	  this->joint->GetScopedName(), this->pid);
-	  this->model->GetJointController()->SetJointPosition(
-		  this->joint1->GetScopedName(), 0.0);
-	  this->model->GetJointController()->SetJointPosition(
-		  this->joint2->GetScopedName(), 0.0);
-	  // Set the joint's target velocity. This target velocity is just
-	  // for demonstration purposes.
-	  //this->model->GetJointController()->SetPositionTarget(
-		//  this->joint->GetScopedName(), 1);
-    
-      // Just output a message for now
-      std::cerr << "\nThe velodyne plugin is attach to model[" <<
-        _model->GetName() << "]\n";
-        
-        
-       
+      // Default to zero velocity
+      double position = 0.0;
+
+      // Check that the velocity element exists, then read the value
+      if (_sdf->HasElement("position"))
+        position = _sdf->Get<double>("position");
+
+      this->SetPosition(0.0,0.0);
+
+      // Create the node
+      this->node = transport::NodePtr(new transport::Node());
+      #if GAZEBO_MAJOR_VERSION < 8
+      this->node->Init(this->model->GetWorld()->GetName());
+      #else
+      this->node->Init(this->model->GetWorld()->Name());
+      #endif
+
+      // Create a topic name
+      std::string topicName = "~/" + this->model->GetName() + "/vel_cmd";
+
+      // Subscribe to the topic, and register a callback
+      this->sub = this->node->Subscribe(topicName,
+         &VelodynePlugin::OnMsg, this);
+    // Initialize ros, if it has not already bee initialized.
+		if (!ros::isInitialized())
+		{
+		  int argc = 0;
+		  char **argv = NULL;
+		  ros::init(argc, argv, "gazebo_client",
+			  ros::init_options::NoSigintHandler);
+		}
+
+		// Create our ROS node. This acts in a similar manner to
+		// the Gazebo node
+		this->rosNode.reset(new ros::NodeHandle("gazebo_client"));
+
+		// Create a named topic, and subscribe to it.
+		ros::SubscribeOptions so =
+		  ros::SubscribeOptions::create<std_msgs::Float32>(
+			  "/" + this->model->GetName() + "/vel_cmd",
+			  1,
+			  boost::bind(&VelodynePlugin::OnRosMsg, this, _1),
+			  ros::VoidPtr(), &this->rosQueue);
+		this->rosSub = this->rosNode->subscribe(so);
+
+		// Spin up the queue helper thread.
+		this->rosQueueThread =
+		  std::thread(std::bind(&VelodynePlugin::QueueThread, this));
     }
-	/// \brief Pointer to the model.
-	private: physics::ModelPtr model;
+	/// \brief Handle an incoming message from ROS
+	/// \param[in] _msg A float value that is used to set the velocity
+	/// of the Velodyne.
+	public: void OnRosMsg(const std_msgs::Float32ConstPtr &_msg)
+	{
+	  this->SetPosition(_msg->data,_msg->data);
+	}
 
-	/// \brief Pointer to the joint.
-	private: physics::JointPtr joint1;
-	private: physics::JointPtr joint2;
-	/// \brief A PID controller for the joint.
-	private: common::PID pid;
+	/// \brief ROS helper function that processes messages
+	private: void QueueThread()
+	{
+	  static const double timeout = 0.01;
+	  while (this->rosNode->ok())
+	  {
+		this->rosQueue.callAvailable(ros::WallDuration(timeout));
+	  }
+	}
+    /// \brief Set the velocity of the Velodyne
+    /// \param[in] _vel New target velocity
+    public: void SetPosition(const double &_x,const double &_y)
+    {
+      // Set the joint's target velocity.
 
+      this->joint->SetPosition(1,_y);
+      this->model->GetJointController()->SetPositionTarget(
+          this->joint->GetScopedName(), _x );
+      //this->joint->SetPosition(0,_x);
+    }
 
+    /// \brief Handle incoming message
+    /// \param[in] _msg Repurpose a vector3 message. This function will
+    /// only use the x ,ycomponent.
+    private: void OnMsg(ConstVector3dPtr &_msg)
+    {
+      this->SetPosition(_msg->x(),_msg->y());
+    }
+
+    /// \brief A node used for transport
+    private: transport::NodePtr node;
+
+    /// \brief A subscriber to a named topic.
+    private: transport::SubscriberPtr sub;
+
+    /// \brief Pointer to the model.
+    private: physics::ModelPtr model;
+
+    /// \brief Pointer to the joint.
+    private: physics::JointPtr joint;
+
+    /// \brief A PID controller for the joint.
+    private: common::PID pid;
+  /// \brief A node use for ROS transport
+	private: std::unique_ptr<ros::NodeHandle> rosNode;
+
+	/// \brief A ROS subscriber
+	private: ros::Subscriber rosSub;
+
+	/// \brief A ROS callbackqueue that helps process messages
+	private: ros::CallbackQueue rosQueue;
+
+	/// \brief A thread the keeps running the rosQueue
+	private: std::thread rosQueueThread;
   };
 
   // Tell Gazebo about this plugin, so that Gazebo can call Load on this plugin.
