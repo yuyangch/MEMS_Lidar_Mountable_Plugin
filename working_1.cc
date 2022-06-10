@@ -10,6 +10,7 @@
 #include "ros/callback_queue.h"
 #include "ros/subscribe_options.h"
 #include "std_msgs/Float32.h"
+#include "std_msgs/Float32MultiArray.h"
 namespace gazebo
 {
   /// \brief A plugin to control a Velodyne sensor.
@@ -37,16 +38,16 @@ namespace gazebo
 
       // Get the first joint. We are making an assumption about the model
       // having one joint that is the rotational joint.
-      this->azimuth_joint = _model->GetJoints()[0];
-      this->elevation_joint = _model->GetJoints()[1];
+      std::cout<<"0,size of vecotr "<< (_model->GetJoints()).size()<<"get joint count"<<_model->GetJointCount()<<"\n";
+      this->joint = _model->GetJoints()[0];
+	  std::cout<<"1\n";
       // Setup a P-controller, with a gain of 0.1.
-      this->a_pid = common::PID(0.05, 0, 0.04);
-      this->e_pid = common::PID(0.05, 0, 0.04);
+      this->pid = common::PID(0.05, 0, 0.04);
+
       // Apply the P-controller to the joint.
       this->model->GetJointController()->SetPositionPID(
-          this->azimuth_joint->GetScopedName(), this->a_pid);
-      this->model->GetJointController()->SetPositionPID(
-          this->elevation_joint->GetScopedName(), this->e_pid);
+          this->joint->GetScopedName(), this->pid);
+
       // Default to zero velocity
       double position = 0.0;
 
@@ -54,8 +55,8 @@ namespace gazebo
       if (_sdf->HasElement("position"))
         position = _sdf->Get<double>("position");
 
-      this->SetAPosition(position);
-	  this->SetEPosition(-.3);
+      this->SetPosition(0.0,0.0);
+
       // Create the node
       this->node = transport::NodePtr(new transport::Node());
       #if GAZEBO_MAJOR_VERSION < 8
@@ -101,7 +102,7 @@ namespace gazebo
 	/// of the Velodyne.
 	public: void OnRosMsg(const std_msgs::Float32ConstPtr &_msg)
 	{
-	  this->SetEPosition(_msg->data);
+	  this->SetPosition(_msg->data,_msg->data);
 	}
 
 	/// \brief ROS helper function that processes messages
@@ -115,24 +116,22 @@ namespace gazebo
 	}
     /// \brief Set the velocity of the Velodyne
     /// \param[in] _vel New target velocity
-    public: void SetAPosition(const double &_vel)
+    public: void SetPosition(const double &_x,const double &_y)
     {
       // Set the joint's target velocity.
+
+      this->joint->SetPosition(1,_y);
       this->model->GetJointController()->SetPositionTarget(
-          this->azimuth_joint->GetScopedName(), _vel);
+          this->joint->GetScopedName(), _x );
+      //this->joint->SetPosition(0,_x);
     }
-    public: void SetEPosition(const double &_vel)
-    {
-      // Set the joint's target velocity.
-      this->model->GetJointController()->SetPositionTarget(
-          this->elevation_joint->GetScopedName(), _vel);
-    }
+
     /// \brief Handle incoming message
     /// \param[in] _msg Repurpose a vector3 message. This function will
-    /// only use the x component.
+    /// only use the x ,ycomponent.
     private: void OnMsg(ConstVector3dPtr &_msg)
     {
-      this->SetAPosition(_msg->x());
+      this->SetPosition(_msg->x(),_msg->y());
     }
 
     /// \brief A node used for transport
@@ -145,11 +144,10 @@ namespace gazebo
     private: physics::ModelPtr model;
 
     /// \brief Pointer to the joint.
-    private: physics::JointPtr azimuth_joint;
-	private: physics::JointPtr elevation_joint;
+    private: physics::JointPtr joint;
+
     /// \brief A PID controller for the joint.
-    private: common::PID a_pid;
-    private: common::PID e_pid;
+    private: common::PID pid;
   /// \brief A node use for ROS transport
 	private: std::unique_ptr<ros::NodeHandle> rosNode;
 

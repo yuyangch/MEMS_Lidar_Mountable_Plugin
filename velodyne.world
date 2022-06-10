@@ -15,7 +15,6 @@
       <include>
         <uri>model://velodyne_hdl15</uri>
       </include>
-
       <!-- Attach the plugin to this model -->
       <plugin name="velodyne_control" filename="libvelodyne_plugin.so"/>
     </model>

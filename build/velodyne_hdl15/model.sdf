@@ -7,11 +7,11 @@
     <!-- Offset the base by half the lenght of the cylinder -->
     <pose>0 0 0.029335 0 0 0</pose>
     <inertial>
-      <mass>12</mass>
+      <mass>120</mass>
       <inertia>
-        <ixx>0.01087473</ixx>
-        <iyy>0.01087473</iyy>
-        <izz>0.01092437</izz>
+        <ixx>10.87473</ixx>
+        <iyy>10.87473</iyy>
+        <izz>10.92437</izz>
         <ixy>0</ixy>
         <ixz>0</ixz>
         <iyz>0</iyz>
@@ -126,9 +126,9 @@
     <inertial>
       <mass>0.1</mass>
       <inertia>
-        <ixx>0.0090623</ixx>
-        <iyy>0.0090623</iyy>
-        <izz>0.0091036</izz>
+        <ixx>0.000090623</ixx>
+        <iyy>0.000090623</iyy>
+        <izz>0.000091036</izz>
         <ixy>0</ixy>
         <ixz>0</ixz>
         <iyz>0</iyz>
@@ -178,7 +178,7 @@
     <!-- The axis defines the joint's degree of freedom -->
     <axis>
 
-      <!-- Revolve around the z-axis -->
+      <!-- Revolve around the x-axis -->
       <xyz>1 0 0</xyz>
 
       <!-- Limit refers to the range of motion of the joint -->

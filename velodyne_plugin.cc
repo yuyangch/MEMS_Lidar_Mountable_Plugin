@@ -40,7 +40,7 @@ namespace gazebo
       // having one joint that is the rotational joint.
       std::cout<<"0,size of vecotr "<< (_model->GetJoints()).size()<<"get joint count"<<_model->GetJointCount()<<"\n";
       this->joint = _model->GetJoints()[0];
-	  std::cout<<"1\n";
+	     std::cout<<"1\n";
       // Setup a P-controller, with a gain of 0.1.
       this->pid = common::PID(0.05, 0, 0.04);
 
@@ -121,6 +121,7 @@ namespace gazebo
       // Set the joint's target velocity.
 
       this->joint->SetPosition(1,_y);
+      this->joint->SetPosition(0,_x);
       this->model->GetJointController()->SetPositionTarget(
           this->joint->GetScopedName(), _x );
       //this->joint->SetPosition(0,_x);
