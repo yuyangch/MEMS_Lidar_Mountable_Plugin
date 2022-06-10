@@ -42,7 +42,7 @@ namespace gazebo
       this->joint = _model->GetJoints()[0];
 	     std::cout<<"1\n";
       // Setup a P-controller, with a gain of 0.1.
-      this->pid = common::PID(0.05, 0, 0.04);
+      this->pid = common::PID( 288, 5, .01);
 
       // Apply the P-controller to the joint.
       this->model->GetJointController()->SetPositionPID(
