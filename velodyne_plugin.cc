@@ -11,6 +11,7 @@
 #include "ros/subscribe_options.h"
 #include "std_msgs/Float32.h"
 #include "std_msgs/Float32MultiArray.h"
+#include <cmath>
 namespace gazebo
 {
   /// \brief A plugin to control a Velodyne sensor.
@@ -26,6 +27,23 @@ namespace gazebo
     /// \param[in] _sdf A pointer to the plugin's SDF element.
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     {
+
+      //Generate full lidar scanning pattern
+      this->generate_lidar_scanning_pattern();
+      
+      // max. pixels
+      /*
+        for (i = 0; i < px; i++)
+        {
+          thxa[i] = thx_bot + i * (thx_top - thx_bot) / (px - 1);
+          thxa[2 * px - i - 1] = thxa[i] ;
+        }
+        for (i = 0; i < py; i++)
+        {
+          thya[i] = thy_bot + i * (thy_top - thy_bot) / (py - 1);
+          thya[2 * py - i - 1] = thya[i] ;
+        }
+      */
       // Safety check
       if (_model->GetJointCount() == 0)
       {
@@ -96,6 +114,14 @@ namespace gazebo
 		// Spin up the queue helper thread.
 		this->rosQueueThread =
 		  std::thread(std::bind(&VelodynePlugin::QueueThread, this));
+
+    // Listen to the update event. This event is broadcast every
+    // simulation iteration.
+    this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+        std::bind(&VelodynePlugin::OnUpdate, this));
+
+
+
     }
 	/// \brief Handle an incoming message from ROS
 	/// \param[in] _msg A float value that is used to set the velocity
@@ -105,6 +131,53 @@ namespace gazebo
 	  this->SetPosition(_msg->data,_msg->data);
 	}
 
+  // Called by the world update start event
+  public: void OnUpdate()
+  {
+    // Apply a small linear velocity to the model.
+     float time =this->model->GetWorld()->SimTime ().Float();
+     int time_ms=static_cast<int>(time*1000);
+     if (time_ms%100==0){
+        this->update_current_rastor_z_scan();
+        this->SetPosition(thx*M_PI/180.0,thy*M_PI/180.0);
+     }
+
+    std::cout<<"time_ms is" <<time_ms<<std::endl;
+
+    
+  }
+  //generate lidar full scanning pattern
+  private: void generate_lidar_scanning_pattern()
+  {
+      //Generate full lidar scanning pattern
+      // max. pixels
+        for (i = 0; i < px; i++)
+        {
+          thxa[i] = thx_bot + i * (thx_top - thx_bot) / (px - 1);
+          thxa[2 * px - i - 1] = thxa[i] ;
+        }
+        for (i = 0; i < py; i++)
+        {
+          thya[i] = thy_bot + i * (thy_top - thy_bot) / (py - 1);
+          thya[2 * py - i - 1] = thya[i] ;
+        }
+  }
+  private: void update_current_rastor_z_scan()
+  {
+  
+      if (I >= px * 2 - 1) //update vx
+        I = 0;
+      else I++;
+
+      if (I == 0 || I == px) //update vy
+      {
+        if (J >= py * 2 - 1) J = 0;
+        else J++;
+      }
+      // Horizontal
+      thx = thxa[I];
+      thy = thya[J];
+  }
 	/// \brief ROS helper function that processes messages
 	private: void QueueThread()
 	{
@@ -120,10 +193,10 @@ namespace gazebo
     {
       // Set the joint's target velocity.
 
-      this->joint->SetPosition(1,_y);
-      this->joint->SetPosition(0,_x);
+      this->joint->SetPosition(1,_x);
+      this->joint->SetPosition(0,_y);
       this->model->GetJointController()->SetPositionTarget(
-          this->joint->GetScopedName(), _x );
+          this->joint->GetScopedName(), _y );
       //this->joint->SetPosition(0,_x);
     }
 
@@ -134,7 +207,23 @@ namespace gazebo
     {
       this->SetPosition(_msg->x(),_msg->y());
     }
+    //update event pointer to interact with lidar 
+    private: event::ConnectionPtr updateConnection;
 
+    /// Lidar scanning pattern storage
+    private: float thxa[1000];
+    private: float thya[1000];
+    //Lidar related variables, 
+    private: float thx_top = 4.5;  //4.5  //horizontal max degree
+    private: float thx_bot = -thx_top;
+    private: float thy_top = thx_top; //vertical max degree
+    private: float thy_bot = -thx_top;
+    private: int px = 20; // {6by6, 6px6px, dly7}  //horizontal resolution
+    private: int py = 20; // x2  //vertical resolution
+    private: int i;     //rastor z scan generation index
+    private: int j;
+    private: int I = 0, J = 0; //rastor z scan update indexes
+    private: float thx,thy;    //rastor z scan output
     /// \brief A node used for transport
     private: transport::NodePtr node;
 

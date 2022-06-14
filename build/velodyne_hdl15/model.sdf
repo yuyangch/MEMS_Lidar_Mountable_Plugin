@@ -71,8 +71,8 @@
 
           <!-- The horizontal beams -->
           <vertical>
-            <!-- The velodyne has 32 beams(samples) -->
-            <samples>32</samples>
+            <!-- The velodyne has 32 beams(samples) CHEN:CHANGE TO 1 FOR MEMS LIDAR-->
+            <samples>1</samples> 
 
             <!-- Resolution is multiplied by samples to determine number of
                  simulated beams vs interpolated beams. See:
@@ -87,8 +87,8 @@
             <max_angle>0.3</max_angle>
           </vertical>
           <horizontal>
-            <!-- The velodyne has 32 beams(samples) -->
-            <samples>32</samples>
+            <!-- The velodyne has 32 beams(samples) CHEN:CHANGE TO 1 FOR MEMS LIDAR-->
+            <samples>1</samples>
 
             <!-- Resolution is multiplied by samples to determine number of
                  simulated beams vs interpolated beams. See:

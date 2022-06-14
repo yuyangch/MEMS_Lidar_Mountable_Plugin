@@ -27,6 +27,8 @@ std_msgs/Float32.h
 /home/chen/lidarsim_gazebo/std_msgs/Float32.h
 std_msgs/Float32MultiArray.h
 /home/chen/lidarsim_gazebo/std_msgs/Float32MultiArray.h
+cmath
+-
 
 /opt/ros/noetic/include/ros/advertise_options.h
 ros/forwards.h
