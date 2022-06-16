@@ -5,11 +5,11 @@ This code is a combination of several parts.
 2) lidar motion controller (velodyne_plugin.cc)is designed to mimic that of the MEMS Lidar (Rastor Z scan pattern). 
 3) lidar sensor ray data piping is an adaptation from https://bitbucket.org/DataspeedInc/velodyne_simulator/src/master/
 
-
+For a youtube video usage demonstration click the image below:
 
 <a href="https://youtu.be/hbRFwD9XrIw
 " target="_blank"><img src="https://img.youtube.com/vi/hbRFwD9XrIw/0.jpg" 
-alt="A video demonstration of mems lidar plugin" width="240" height="180" border="10" /></a>
+alt="A video demonstration of mems lidar plugin" width="1028" height="720" border="10" /></a>
 
 
 ## Installation
