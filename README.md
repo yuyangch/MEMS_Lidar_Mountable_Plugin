@@ -2,8 +2,11 @@
 
 This code is a combination of several parts. 
 1) lidar model is based on this tutorial: https://classic.gazebosim.org/tutorials?cat=guided_i&tut=guided_i2 
-2) lidar motion controller (velodyne_plugin.cc)is designed to mimic that of the MEMS Lidar (Rastor Z scan pattern). 
-3) lidar sensor ray data piping is an adaptation from https://bitbucket.org/DataspeedInc/velodyne_simulator/src/master/
+2) lidar motion controller (velodyne_plugin.cc)software is based on this tutorial https://www.cplusgears.com/lesson-5-adding-a-lidar.html
+
+3) lidar motion controller movement pattern (Raster Z) is based on Dingkang's Arduino code
+
+4) lidar sensor ray data piping is an adaptation from https://bitbucket.org/DataspeedInc/velodyne_simulator/src/master/
 
 For a youtube video usage demonstration click the image below:
 
