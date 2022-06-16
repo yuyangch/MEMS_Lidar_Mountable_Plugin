@@ -1,4 +1,4 @@
-# lidarsim_gazebo
+# MEMS_Lidar_Gazebo_Plugin 
 
 This code is a combination of several parts. 
 1) lidar model is based on this tutorial: https://classic.gazebosim.org/tutorials?cat=guided_i&tut=guided_i2 
@@ -28,7 +28,7 @@ https://classic.gazebosim.org/tutorials?tut=install_ubuntu
 
 ```
 cd ~/
-git clone https://github.com/yuyangch/lidarsim_gazebo.git
+git clone https://github.com/droneslab/MEMS_Lidar_Gazebo_Plugin.git
 ```
 
 
@@ -37,13 +37,13 @@ add the sourcing lines to .bashrc  :
 echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
 ```
 ```bash
-echo "export GAZEBO_MODEL_PATH=${HOME}/lidarsim_gazebo:${GAZEBO_MODEL_PATH}" >> ~/.bashrc
-echo "export GAZEBO_PLUGIN_PATH=${HOME}/lidarsim_gazebo/build:${GAZEBO_PLUGIN_PATH}" >> ~/.bashrc
-echo "export GAZEBO_RESOURCE_PATH=${HOME}/lidarsim_gazebo:${GAZEBO_RESOURCE_PATH}" >> ~/.bashrc
+echo "export GAZEBO_MODEL_PATH=${HOME}/MEMS_Lidar_Gazebo_Plugin:${GAZEBO_MODEL_PATH}" >> ~/.bashrc
+echo "export GAZEBO_PLUGIN_PATH=${HOME}/MEMS_Lidar_Gazebo_Plugin/build:${GAZEBO_PLUGIN_PATH}" >> ~/.bashrc
+echo "export GAZEBO_RESOURCE_PATH=${HOME}/MEMS_Lidar_Gazebo_Plugin:${GAZEBO_RESOURCE_PATH}" >> ~/.bashrc
 ```
 configure and run (standard cmake commands)
 ```
-cd ~/lidarsim_gazebo
+cd ~/MEMS_Lidar_Gazebo_Plugin
 ./config.sh
 ./build.sh
 
@@ -51,7 +51,7 @@ cd ~/lidarsim_gazebo
 
 
 ## Usage
-in ~/lidarsim_gazebo
+in ~/MEMS_Lidar_Gazebo_Plugin
 ```
 roslaunch l_gz.launch
 ```
@@ -106,12 +106,12 @@ The current update rate is 100Hz both in dot switching(velodyne_plugin.cc:line 1
 The main files to modify is:
 The Lidar Controller Plugin  
 ```
-~/lidarsim_gazebo/velodyne_plugin.cc
+~/MEMS_Lidar_Gazebo_Plugin/velodyne_plugin.cc
 ```
 The Lidar Ray Sensor Plugin
 ```
-~/lidarsim_gazebo/src/GazeboRosVelodyneLaser.cpp
-~/lidarsim_gazebo/include/velodyne_gazebo_plugins/GazeboRosVelodyneLaser.h
+~/MEMS_Lidar_Gazebo_Plugin/src/GazeboRosVelodyneLaser.cpp
+~/MEMS_Lidar_Gazebo_Plugin/include/velodyne_gazebo_plugins/GazeboRosVelodyneLaser.h
 ```
 
 The world file
@@ -122,11 +122,11 @@ velodune.world
 The lidar model file (change min/max scanning angle, number of samples horizontal/vertical)
 
 ```
-~/lidarsim_gazebo/velodyne_hdl15/model.sdf
+~/MEMS_Lidar_Gazebo_Plugin/velodyne_hdl15/model.sdf
 ```
 
 The cmake file is worth looking at as well, in case if you need to add your own libraries
 
 ```
-~/lidarsim_gazebo/CMakeLists.txt
+~/MEMS_Lidar_Gazebo_Plugin/CMakeLists.txt
 ```
