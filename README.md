@@ -1,4 +1,17 @@
 # lidarsim_gazebo
+
+This code is a combination of several parts. 
+1) lidar model is based on this tutorial: https://classic.gazebosim.org/tutorials?cat=guided_i&tut=guided_i2 
+2) lidar motion controller (velodyne_plugin.cc)is designed to mimic that of the MEMS Lidar (Rastor Z scan pattern). 
+3) lidar sensor ray data piping is an adaptation from https://bitbucket.org/DataspeedInc/velodyne_simulator/src/master/
+
+
+
+<a href="https://youtu.be/hbRFwD9XrIw
+" target="_blank"><img src="https://img.youtube.com/vi/hbRFwD9XrIw/0.jpg" 
+alt="A video demonstration of mems lidar plugin" width="240" height="180" border="10" /></a>
+
+
 ## Installation
 
 
@@ -19,7 +32,7 @@ git clone https://github.com/yuyangch/lidarsim_gazebo.git
 ```
 
 
-
+add the sourcing lines to .bashrc  :
 ```bash
 echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
 ```
@@ -28,7 +41,7 @@ echo "export GAZEBO_MODEL_PATH=${HOME}/lidarsim_gazebo:${GAZEBO_MODEL_PATH}" >> 
 echo "export GAZEBO_PLUGIN_PATH=${HOME}/lidarsim_gazebo/build:${GAZEBO_PLUGIN_PATH}" >> ~/.bashrc
 echo "export GAZEBO_RESOURCE_PATH=${HOME}/lidarsim_gazebo:${GAZEBO_RESOURCE_PATH}" >> ~/.bashrc
 ```
-
+configure and run (standard cmake commands)
 ```
 cd ~/lidarsim_gazebo
 ./config.sh
@@ -85,6 +98,11 @@ The example code is in vel.cc, you can modify it
 
 
 ## Develop Code
+
+The current update rate is 100Hz both in dot switching(velodyne_plugin.cc:line 140) and lidar update 
+
+
+
 The main files to modify is:
 The Lidar Controller Plugin  
 ```
