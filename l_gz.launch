@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-
+  <node type="rviz" name="rviz" pkg="rviz" args="-d $(env HOME)/lidarsim_gazebo/lidar_rviz.rviz" />
   <!-- these are the arguments you can pass this launch file, for example paused:=true -->
   <arg name="paused" default="false"/>
   <arg name="use_sim_time" default="true"/>
@@ -15,14 +15,14 @@
   <arg name="physics" default="ode"/>
   <arg name="verbose" default="true"/>
   <arg name="output" default="screen"/>
-  <arg name="world_name" default="../velodyne.world"/> <!-- Note: the world_name is with respect to GAZEBO_RESOURCE_PATH environmental variable -->
+  <arg name="world_name" default="velodyne.world"/> <!-- Note: the world_name is with respect to GAZEBO_RESOURCE_PATH environmental variable -->
   <arg name="respawn_gazebo" default="false"/>
   <arg name="use_clock_frequency" default="false"/>
   <arg name="pub_clock_frequency" default="100"/>
   <arg name="enable_ros_network" default="true" />
   <arg name="server_required" default="false"/>
   <arg name="gui_required" default="false"/>
-
+  
   <!-- set use_sim_time flag -->
   <param name="/use_sim_time" value="true"/>
 

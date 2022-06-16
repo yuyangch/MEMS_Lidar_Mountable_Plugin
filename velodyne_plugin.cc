@@ -134,15 +134,15 @@ namespace gazebo
   // Called by the world update start event
   public: void OnUpdate()
   {
-    // Apply a small linear velocity to the model.
+    // update position every 100 milliseconds
      float time =this->model->GetWorld()->SimTime ().Float();
      int time_ms=static_cast<int>(time*1000);
-     if (time_ms%100==0){
+     if (time_ms%10==0){
         this->update_current_rastor_z_scan();
-        this->SetPosition(thx*M_PI/180.0,thy*M_PI/180.0);
+        this->SetPosition((thx+azimuth_control_input)*M_PI/180.0,(thy+elevation_control_input)*M_PI/180.0);
      }
 
-    std::cout<<"time_ms is" <<time_ms<<std::endl;
+    //std::cout<<"time_ms is" <<time_ms<<std::endl;
 
     
   }
@@ -205,7 +205,8 @@ namespace gazebo
     /// only use the x ,ycomponent.
     private: void OnMsg(ConstVector3dPtr &_msg)
     {
-      this->SetPosition(_msg->x(),_msg->y());
+       azimuth_control_input=_msg->x();
+       elevation_control_input=_msg->y();
     }
     //update event pointer to interact with lidar 
     private: event::ConnectionPtr updateConnection;
@@ -224,6 +225,7 @@ namespace gazebo
     private: int j;
     private: int I = 0, J = 0; //rastor z scan update indexes
     private: float thx,thy;    //rastor z scan output
+    private: float azimuth_control_input=0.0,elevation_control_input=0.0;
     /// \brief A node used for transport
     private: transport::NodePtr node;
 
