@@ -153,9 +153,9 @@ Range (Distance): 2-2.6 Meters tested most
 ```
 FOV:+-4.5 degree horizontal/Vertical
 
-Azimuth/Elevation angle input limit: 4-6 degree (this input changes principle axis direction)
+Azimuth/Elevation angle input limit: no limite (this input changes principle axis direction)
 
-Frequency of Rastor Z scanning:100 Hz 
+Frequency of Rastor Z scanning:100 Hz (can be 1000Hz at simulation real time factor 1)
 
 Max Frequency of  Azimuth/Elevation angle input change:1000Hz
 
