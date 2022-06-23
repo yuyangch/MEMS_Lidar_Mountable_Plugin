@@ -133,3 +133,34 @@ The cmake file is worth looking at as well, in case if you need to add your own 
 ```
 ~/MEMS_Lidar_Gazebo_Plugin/CMakeLists.txt
 ```
+
+## Parameters
+### Real Lidar
+```
+FOV:+-4.5 degree horizontal/Vertical
+
+Azimuth/Elevation angle input limit: 4-6 degree (this input changes principle axis direction)
+
+Frequency of Rastor Z scanning:100 Hz (need to verify)
+
+Max Frequency of  Azimuth/Elevation angle input change:50 Hz
+
+Resolution 20x20, can be adjusted up,  but points/second won't change, which slows down update rate. Need to verify points/second
+
+Range (Distance): 2-2.6 Meters tested most
+```
+### Simulated Gazebo/ROS Lidar (All parameters adjustable)
+```
+FOV:+-4.5 degree horizontal/Vertical
+
+Azimuth/Elevation angle input limit: 4-6 degree (this input changes principle axis direction)
+
+Frequency of Rastor Z scanning:100 Hz 
+
+Max Frequency of  Azimuth/Elevation angle input change:1000Hz
+
+Resolution: 20x20, can be adjusted up,  but points/min won't change, althought this is at 1000 points/second in realtime factor 1. can be higher if lower simulation realtime factor, for example, 2000 points/second at realtime factor .5 
+
+Range: unlimited currently
+```
+
