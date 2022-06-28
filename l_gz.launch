@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-  <node type="rviz" name="rviz" pkg="rviz" args="-d $(env HOME)/lidarsim_gazebo/lidar_rviz.rviz" />
+  <node type="rviz" name="rviz" pkg="rviz" args="-d $(env HOME)/MEMS_Lidar_Gazebo_Plugin/lidar_rviz.rviz" />
   <!-- these are the arguments you can pass this launch file, for example paused:=true -->
   <arg name="paused" default="false"/>
   <arg name="use_sim_time" default="true"/>
