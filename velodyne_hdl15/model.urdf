@@ -1,0 +1,55 @@
+<?xml version="1.0" ?>
+<robot name="velodyne_hdl-32">
+  <joint name="velodyne_hdl-32__elevation_joint" type="revolute">
+    <parent link="velodyne_hdl-32__base"/>
+    <child link="velodyne_hdl-32__elevation_joint__revolute_dummy_link"/>
+    <origin xyz="0      0      0.05867" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-1.57" upper="1.57" effort="0.0" velocity="0.0"/>
+  </joint>
+  <link name="velodyne_hdl-32__elevation_joint__revolute_dummy_link"/>
+  <joint name="velodyne_hdl-32__elevation_joint__revolute_dummy_joint" type="revolute">
+    <parent link="velodyne_hdl-32__elevation_joint__revolute_dummy_link"/>
+    <child link="velodyne_hdl-32__top"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-1.57" upper="1.57" effort="0.0" velocity="0.0"/>
+  </joint>
+  <link name="velodyne_hdl-32__base">
+    <inertial>
+      <mass value="120"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="10.87473" ixy="0" ixz="0" iyy="10.87473" iyz="0" izz="10.92437"/>
+    </inertial>
+    <collision name="velodyne_hdl-32__base_collision">
+      <origin xyz="0      0      0.02933" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius=".04267" length=".05867"/>
+      </geometry>
+    </collision>
+    <visual name="velodyne_hdl-32__base_visual">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="/home/chen/MEMS_Lidar_Gazebo_Plugin/velodyne_hdl15/meshes/velodyne_base.dae" scale="1.0 1.0 1.0"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="velodyne_hdl-32__top">
+    <inertial>
+      <mass value="0.1"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.000090623" ixy="0" ixz="0" iyy="0.000090623" iyz="0" izz="0.000091036"/>
+    </inertial>
+    <collision name="velodyne_hdl-32__top_collision">
+      <origin xyz="0      0      0.03678" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.0004267" length="0.0007357"/>
+      </geometry>
+    </collision>
+    <visual name="velodyne_hdl-32__top_visual">
+      <origin xyz="0       0      -0.00089" rpy="0      0      3.14159"/>
+      <geometry>
+        <mesh filename="/home/chen/MEMS_Lidar_Gazebo_Plugin/velodyne_hdl15/meshes/velodyne_top.dae" scale="1.0 1.0 1.0"/>
+      </geometry>
+    </visual>
+  </link>
+</robot>

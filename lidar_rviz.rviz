@@ -7,7 +7,8 @@ Panels:
         - /Global Options1
         - /Status1
         - /PointCloud21
-        - /PointCloud21/Status1
+        - /PointCloud22
+        - /PointCloud22/Status1
       Splitter Ratio: 0.5
     Tree Height: 549
   - Class: rviz/Selection
@@ -82,11 +83,39 @@ Visualization Manager:
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz/PointCloud2
+      Color: 255; 255; 255
+      Color Transformer: Intensity
+      Decay Time: 0
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Min Color: 0; 0; 0
+      Name: PointCloud2
+      Position Transformer: XYZ
+      Queue Size: 10
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.009999999776482582
+      Style: Flat Squares
+      Topic: /libgazebo_ros_velodyne_laser
+      Unreliable: false
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
     Default Light: true
-    Fixed Frame: velodyne_hdl-32::base
+    Fixed Frame: velodyne_hdl_15::base
     Frame Rate: 30
   Name: root
   Tools:
@@ -110,7 +139,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 14.155477523803711
+      Distance: 15.179048538208008
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -118,17 +147,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 0.4773390591144562
-        Y: 0.6946064829826355
-        Z: 1.8319486379623413
+        X: 0.07560644298791885
+        Y: 1.5166597366333008
+        Z: 1.3089933395385742
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.3103984296321869
+      Pitch: -0.039601560682058334
       Target Frame: <Fixed Frame>
-      Yaw: 3.160402774810791
+      Yaw: 3.1754016876220703
     Saved: ~
 Window Geometry:
   Displays:
@@ -147,4 +176,4 @@ Window Geometry:
     collapsed: false
   Width: 1402
   X: 364
-  Y: 93
+  Y: 56

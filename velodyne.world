@@ -4,7 +4,7 @@
     <physics type="ode">
       <ode>
         <solver>
-          <type>world</type>
+          <type>quick</type>
         </solver>
       </ode>
       <max_step_size>0.001</max_step_size>
@@ -21,11 +21,10 @@
     <!-- A testing model that includes the Velodyne sensor model -->
     <model name="my_velodyne">
       <include>
-        <uri>model://velodyne_hdl15</uri>
+        <uri>/home/chen/MEMS_Lidar_Gazebo_Plugin/velodyne_hdl15</uri>
       </include>
-      <!-- Attach the plugin to this model -->
-      <plugin name="velodyne_control" filename="libvelodyne_plugin.so"/>
+      <!--plugin name="velodyne_control" filename="libvelodyne_plugin.so"/-->
     </model>
-
+  
   </world>
 </sdf>

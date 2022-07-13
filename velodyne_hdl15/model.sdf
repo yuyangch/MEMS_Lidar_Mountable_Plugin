@@ -1,17 +1,20 @@
 <?xml version="1.0"?>
 <sdf version="1.5">
-<model name="velodyne_hdl-32">
+<model name="velodyne_hdl_15">
   <!-- Give the base link a unique name -->
-  <link name="base">
+  <!--plugin name="velodyne_control" filename="libvelodyne_plugin.so"/-->
+  <plugin name="velodyne_control" filename="libvelodyne_plugin.so"/>
 
+  <link name="base">
+    
     <!-- Offset the base by half the lenght of the cylinder -->
     <pose>0 0 0.029335 0 0 0</pose>
     <inertial>
-      <mass>120</mass>
+      <mass>.0000000012</mass>
       <inertia>
-        <ixx>10.87473</ixx>
-        <iyy>10.87473</iyy>
-        <izz>10.92437</izz>
+        <ixx>0.000001087473</ixx>
+        <iyy>0.000001087473</iyy>
+        <izz>0.000001092437</izz>
         <ixy>0</ixy>
         <ixz>0</ixz>
         <iyz>0</iyz>
@@ -36,7 +39,7 @@
       <pose>0 0 -0.029335 0 0 0</pose>
       <geometry>
         <mesh>
-          <uri>model://velodyne_hdl32/meshes/velodyne_base.dae</uri>
+          <uri>model://velodyne_hdl15/meshes/velodyne_base.dae</uri>
         </mesh>
       </geometry>
     </visual>
@@ -130,7 +133,7 @@
     <!--<pose>0 0 0.095455 0 0 0</pose>-->
     <pose>0 0 0.095455 0 0 0</pose>
     <inertial>
-      <mass>0.1</mass>
+      <mass>0.000000001</mass>
       <inertia>
         <ixx>0.000090623</ixx>
         <iyy>0.000090623</iyy>
@@ -163,7 +166,7 @@
           <!-- The URI should refer to the 3D mesh. The "model:"
               URI scheme indicates that the we are referencing a Gazebo
               model. -->
-          <uri>model://velodyne_hdl32/meshes/velodyne_top.dae</uri>
+          <uri>model://velodyne_hdl15/meshes/velodyne_top.dae</uri>
         </mesh>
       </geometry>
     </visual>
@@ -209,6 +212,5 @@
       </limit>
     </axis2>
   </joint>
-
 </model>
 </sdf>

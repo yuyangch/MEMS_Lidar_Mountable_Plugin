@@ -56,8 +56,15 @@ namespace gazebo
 
       // Get the first joint. We are making an assumption about the model
       // having one joint that is the rotational joint.
+
       std::cout<<"0,size of vecotr "<< (_model->GetJoints()).size()<<"get joint count"<<_model->GetJointCount()<<"\n";
-      this->joint = _model->GetJoints()[0];
+      std::cout<<"model get name is "<<this->model->GetName()<<std::endl;
+      std::cout<<"sdf get name is "<<_sdf->GetName()<<std::endl;
+
+
+      std::string jointName =  this->model->GetName() +"::velodyne_hdl_15::"+ "elevation_joint";
+      
+      this->joint = _model->GetJoint(jointName);
 	     std::cout<<"1\n";
       // Setup a P-controller, with a gain of 0.1.
       this->pid = common::PID( 288, 5, .01);
