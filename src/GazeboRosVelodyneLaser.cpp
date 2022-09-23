@@ -383,18 +383,46 @@ void GazeboRosVelodyneLaser::OnScan(ConstLaserScanStampedPtr& _msg)
       } else {
         pAngle = verticalMinAngle.Radian();
       }
+
+
+
       ignition::math::Vector3 vec=ignition::math::Vector3(r,0.0,0.0);
-      std::cout<<"Rot is "<<_l->RelativePose().Rot()<<std::endl;
+      
       _l->RelativePose().Rot().Normalize();
-      std::cout<<"Rot after Normalize is "<<_l->RelativePose().Rot()<<std::endl;
+      
       ignition::math::Vector3 vec1=_l->RelativePose().Rot().RotateVector(vec);
-      std::cout<<"vec is "<<vec<<std::endl;
+
+      //pAngle=_l->RelativePose().Rot().Roll();  //elevation Chen: these two lines exists to compensate for velodyne sensor rotation, but it overwrites the same two azimuth/elevation angles from velodyne sensor scan. it only works in single dot case of MEMS mirror
+      //yAngle=_l->RelativePose().Rot().Yaw();    //azimuth
+
+
+
+      if(false)  //chen:DEBUG purpose
+      {
+      std::cout<<"yDiff "<<yDiff<<std::endl;
+      std::cout<<"pDiff "<<pDiff<<std::endl;
+
+      std::cout<<"rangeCount "<<rangeCount<<std::endl;
+      std::cout<<"verticalRangeCount "<<verticalRangeCount<<std::endl;
+
+      std::cout<<"minAngle.Radian() "<<minAngle.Radian()<<std::endl;
+      std::cout<<"verticalMinAngle.Radian() "<<verticalMinAngle.Radian()<<std::endl;
+
+
+      std::cout<<"yAngleis "<<yAngle<<std::endl;
+      std::cout<<"pAngleis "<<pAngle<<std::endl;
+
+
+      std::cout<<"Rot is "<<_l->RelativePose().Rot()<<std::endl;
+      std::cout<<"Rot after Normalize is "<<_l->RelativePose().Rot()<<std::endl;
+            std::cout<<"vec is "<<vec<<std::endl;
       std::cout<<"vec1 is "<<vec1<<std::endl;
-      pAngle=_l->RelativePose().Rot().Roll();  //elevation
-      yAngle=_l->RelativePose().Rot().Yaw();    //azimuth
       std::cout<<"x is "<<r * cos(pAngle) * cos(yAngle)<<std::endl; // x
       std::cout<<"y is "<<r * cos(pAngle) * sin(yAngle)<<std::endl; // y
       std::cout<<"z is "<<r * sin(pAngle)<<std::endl; // z
+
+      }
+
       // pAngle is rotated by yAngle:
       if ((MIN_RANGE < r) && (r < MAX_RANGE)) {
 
@@ -431,7 +459,7 @@ void GazeboRosVelodyneLaser::OnScan(ConstLaserScanStampedPtr& _msg)
 
 
 
-      ROS_INFO("[%f] %s", yaw,out.c_str());
+      //ROS_INFO("[%f] %s", yaw,out.c_str());
 
     }
   }

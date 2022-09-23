@@ -10,6 +10,7 @@
 #include "ros/callback_queue.h"
 #include "ros/subscribe_options.h"
 #include "std_msgs/Float32.h"
+#include "geometry_msgs/Vector3.h"
 #include "std_msgs/Float32MultiArray.h"
 #include <cmath>
 namespace gazebo
@@ -65,7 +66,10 @@ namespace gazebo
       std::string jointName =  this->model->GetName() +"::velodyne_hdl_15::"+ "elevation_joint";
       
       this->joint = _model->GetJoint(jointName);
+      
 	     std::cout<<"1\n";
+	     std::cout<<this->joint->GetName()<<std::endl;
+	     
       // Setup a P-controller, with a gain of 0.1.
       this->pid = common::PID( 288, 5, .01);
 
@@ -111,7 +115,7 @@ namespace gazebo
 
 		// Create a named topic, and subscribe to it.
 		ros::SubscribeOptions so =
-		  ros::SubscribeOptions::create<std_msgs::Float32>(
+		  ros::SubscribeOptions::create<geometry_msgs::Vector3>(
 			  "/" + this->model->GetName() + "/vel_cmd",
 			  1,
 			  boost::bind(&VelodynePlugin::OnRosMsg, this, _1),
@@ -133,9 +137,10 @@ namespace gazebo
 	/// \brief Handle an incoming message from ROS
 	/// \param[in] _msg A float value that is used to set the velocity
 	/// of the Velodyne.
-	public: void OnRosMsg(const std_msgs::Float32ConstPtr &_msg)
+	public: void OnRosMsg(const geometry_msgs::Vector3ConstPtr &_msg)
 	{
-	  this->SetPosition(_msg->data,_msg->data);
+		       azimuth_control_input=_msg->x;
+		       elevation_control_input=_msg->y;
 	}
 
   // Called by the world update start event
@@ -146,6 +151,10 @@ namespace gazebo
      int time_ms=static_cast<int>(time*1000);
      if (time_ms%10==0){
         this->update_current_rastor_z_scan();
+        std::cout<<"azimuth_control_input elevation_control_input"<< azimuth_control_input<<" "<<elevation_control_input<<std::endl;
+
+
+
         this->SetPosition((thx+azimuth_control_input)*M_PI/180.0,(thy+elevation_control_input)*M_PI/180.0);
      }
 
@@ -222,7 +231,7 @@ namespace gazebo
     private: float thxa[1000];
     private: float thya[1000];
     //Lidar related variables, 
-    private: float thx_top = 4.5;  //4.5  //horizontal max degree
+    private: float thx_top = 0.0;  //4.5  //horizontal max degree
     private: float thx_bot = -thx_top;
     private: float thy_top = thx_top; //vertical max degree
     private: float thy_bot = -thx_top;
