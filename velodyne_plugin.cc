@@ -11,6 +11,7 @@
 #include "ros/subscribe_options.h"
 #include "std_msgs/Float32.h"
 #include "geometry_msgs/Vector3.h"
+#include "geometry_msgs/Vector3Stamped.h"
 #include "std_msgs/Float32MultiArray.h"
 #include <cmath>
 namespace gazebo
@@ -122,6 +123,10 @@ namespace gazebo
 			  ros::VoidPtr(), &this->rosQueue);
 		this->rosSub = this->rosNode->subscribe(so);
 
+    this->rosPub = this->rosNode->advertise<geometry_msgs::Vector3Stamped>("/MEMS_rotation", 1); 
+
+
+
 		// Spin up the queue helper thread.
 		this->rosQueueThread =
 		  std::thread(std::bind(&VelodynePlugin::QueueThread, this));
@@ -156,6 +161,13 @@ namespace gazebo
 
 
         this->SetPosition((thx+azimuth_control_input)*M_PI/180.0,(thy+elevation_control_input)*M_PI/180.0);
+
+        geometry_msgs::Vector3Stamped v3s;
+        
+        v3s.header.stamp=ros::Time::now();
+        v3s.vector.y=elevation_control_input;
+        v3s.vector.z=azimuth_control_input;
+        this->rosPub.publish(v3s);
      }
 
     //std::cout<<"time_ms is" <<time_ms<<std::endl;
@@ -248,6 +260,9 @@ namespace gazebo
     /// \brief A subscriber to a named topic.
     private: transport::SubscriberPtr sub;
 
+
+
+
     /// \brief Pointer to the model.
     private: physics::ModelPtr model;
 
@@ -262,11 +277,17 @@ namespace gazebo
 	/// \brief A ROS subscriber
 	private: ros::Subscriber rosSub;
 
+
 	/// \brief A ROS callbackqueue that helps process messages
 	private: ros::CallbackQueue rosQueue;
 
 	/// \brief A thread the keeps running the rosQueue
 	private: std::thread rosQueueThread;
+
+
+  private: ros::Publisher rosPub;
+
+
   };
 
   // Tell Gazebo about this plugin, so that Gazebo can call Load on this plugin.
