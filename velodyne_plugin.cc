@@ -59,17 +59,17 @@ namespace gazebo
       // Get the first joint. We are making an assumption about the model
       // having one joint that is the rotational joint.
 
-      std::cout<<"0,size of vecotr "<< (_model->GetJoints()).size()<<"get joint count"<<_model->GetJointCount()<<"\n";
-      std::cout<<"model get name is "<<this->model->GetName()<<std::endl;
-      std::cout<<"sdf get name is "<<_sdf->GetName()<<std::endl;
+      //std::cout<<"0,size of vecotr "<< (_model->GetJoints()).size()<<"get joint count"<<_model->GetJointCount()<<"\n";
+      //std::cout<<"model get name is "<<this->model->GetName()<<std::endl;
+      //std::cout<<"sdf get name is "<<_sdf->GetName()<<std::endl;
 
 
       std::string jointName =  this->model->GetName() +"::velodyne_hdl_15::"+ "elevation_joint";
       
       this->joint = _model->GetJoint(jointName);
       
-	     std::cout<<"1\n";
-	     std::cout<<this->joint->GetName()<<std::endl;
+	     //std::cout<<"1\n";
+	     //std::cout<<this->joint->GetName()<<std::endl;
 	     
       // Setup a P-controller, with a gain of 0.1.
       this->pid = common::PID( 288, 5, .01);
@@ -85,6 +85,13 @@ namespace gazebo
       if (_sdf->HasElement("position"))
         position = _sdf->Get<double>("position");
 
+      if (_sdf->HasElement("GaussianNoise"))
+        angular_noise_std = _sdf->Get<double>("GaussianNoise");
+      else
+        std::cout<<"lidar controller plugin lacks GaussianNoise parameter, defaults to 0.0"<<std::endl;
+
+      distribution= new std::normal_distribution<double>(0,angular_noise_std);
+      std::cout<<"distribution mean and stddev "<<distribution->mean()<<" "<<distribution->stddev()<<std::endl;
       this->SetPosition(0.0,0.0);
 
       // Create the node
@@ -144,8 +151,10 @@ namespace gazebo
 	/// of the Velodyne.
 	public: void OnRosMsg(const geometry_msgs::Vector3ConstPtr &_msg)
 	{
-		       azimuth_control_input=_msg->x;
-		       elevation_control_input=_msg->y;
+           azimuth_control_input_setpoint=_msg->z;
+           elevation_control_input_setpoint=_msg->y;
+		       azimuth_control_input=_msg->z+(*distribution)(generator);
+		       elevation_control_input=_msg->y+(*distribution)(generator);
 	}
 
   // Called by the world update start event
@@ -157,16 +166,16 @@ namespace gazebo
      if (time_ms%10==0){
         this->update_current_rastor_z_scan();
         std::cout<<"azimuth_control_input elevation_control_input"<< azimuth_control_input<<" "<<elevation_control_input<<std::endl;
-
-
-
+        std::cout<<"azimuth_control_input elevation_control_input setpoints"<< azimuth_control_input_setpoint<<" "<<elevation_control_input_setpoint<<std::endl;
+        std::cout<<"noise level "<<angular_noise_std<<std::endl;
+        std::cout<<"distrubtion mean and std"<<distribution->mean()<<" "<<distribution->stddev()<<std::endl;
         this->SetPosition((thx+azimuth_control_input)*M_PI/180.0,(thy+elevation_control_input)*M_PI/180.0);
 
         geometry_msgs::Vector3Stamped v3s;
         
         v3s.header.stamp=ros::Time::now();
-        v3s.vector.y=elevation_control_input;
-        v3s.vector.z=azimuth_control_input;
+        v3s.vector.y=elevation_control_input_setpoint;
+        v3s.vector.z=azimuth_control_input_setpoint;
         this->rosPub.publish(v3s);
      }
 
@@ -221,8 +230,8 @@ namespace gazebo
     {
       // Set the joint's target velocity.
 
-      this->joint->SetPosition(1,_x);
-      this->joint->SetPosition(0,_y);
+      this->joint->SetPosition(1,_x); //joint 1 is azimuth
+      this->joint->SetPosition(0,_y); //joint 0 is elevation
       this->model->GetJointController()->SetPositionTarget(
           this->joint->GetScopedName(), _y );
       //this->joint->SetPosition(0,_x);
@@ -253,7 +262,11 @@ namespace gazebo
     private: int j;
     private: int I = 0, J = 0; //rastor z scan update indexes
     private: float thx,thy;    //rastor z scan output
-    private: float azimuth_control_input=0.0,elevation_control_input=0.0;
+    private: float azimuth_control_input=0.0,elevation_control_input=0.0,azimuth_control_input_setpoint=0.0,elevation_control_input_setpoint=0.0;
+    private: float angular_noise_std=0;
+    private: std::default_random_engine generator;
+    private: std::normal_distribution<double> *distribution;
+
     /// \brief A node used for transport
     private: transport::NodePtr node;
 
@@ -286,6 +299,7 @@ namespace gazebo
 
 
   private: ros::Publisher rosPub;
+
 
 
   };

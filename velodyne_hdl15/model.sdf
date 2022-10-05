@@ -3,8 +3,9 @@
 <model name="velodyne_hdl_15">
   <!-- Give the base link a unique name -->
   <!--plugin name="velodyne_control" filename="libvelodyne_plugin.so"/-->
-  <plugin name="velodyne_control" filename="libvelodyne_plugin.so"/>
-
+  <plugin name="velodyne_control" filename="libvelodyne_plugin.so">
+    <GaussianNoise>3.0</GaussianNoise>
+  </plugin>
   <link name="base">
     
     <!-- Offset the base by half the lenght of the cylinder -->
@@ -117,7 +118,7 @@
     <visual name="top_visual">
       <!-- Lower the mesh by half the height, and rotate by 90 degrees -->
       <!--<pose>0 0 -0.0376785 0 0 1.5707</pose> -->
-      <pose>0 0 -0.0376785 0 0 3.1415926535897932384626433832795</pose>
+      <!--pose>0 0 -0.0376785 0 0 3.1415926535897932384626433832795</pose-->
       <geometry>
         <!-- The mesh tag indicates that we will use a 3D mesh as
              a visual -->
@@ -147,7 +148,7 @@
     <axis>
 
       <!-- Revolve around the x-axis -->
-      <xyz>1 0 0</xyz>
+      <xyz>0 1 0</xyz>
 
       <!-- Limit refers to the range of motion of the joint -->
       <limit>
