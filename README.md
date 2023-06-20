@@ -1,4 +1,6 @@
-# MEMS_Lidar_Gazebo_Plugin 
+
+
+# Step 1 MEMS_Lidar_Gazebo_Plugin 
 
 This code is a combination of several parts. 
 1) lidar model is based on this tutorial: https://classic.gazebosim.org/tutorials?cat=guided_i&tut=guided_i2 
@@ -51,6 +53,8 @@ cd ~/MEMS_Lidar_Gazebo_Plugin
 ./build.sh
 
 ```
+
+
 
 
 ## Usage
@@ -179,4 +183,74 @@ Resolution: 20x20, can be adjusted up,  but points/min won't change, althought t
 
 Range: unlimited currently
 ```
+
+
+
+
+# Step 2 Install PX4-Gazebo Simulation Environment
+
+installation from new wesite 
+1.
+```
+git clone https://github.com/PX4/PX4-Autopilot.git --recursive
+```
+2.
+```
+bash ./PX4-Autopilot/Tools/setup/ubuntu.sh
+```
+3. 
+```
+cd /path/to/PX4-Autopilot
+make px4_sitl gazebo-classic
+```
+4. change world file
+copy world file 
+
+empty_with_houses_v4.world
+into 
+
+~/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/worlds/
+
+5. 
+copy rviz config file 
+dual_gt_estmated_odom_rviz.rviz
+into 
+~/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic
+
+
+add rviz node 
+line 6 of ~/PX4-Autopilot/launch/mavros_posix_sitl.launch
+<node type="rviz" name="rviz" pkg="rviz" args="-d $(find mavlink_sitl_gazebo)/dual_gt_estmated_odom_rviz.rviz" />
+
+
+6. 
+install QGroundControl daily builds
+https://docs.qgroundcontrol.com/master/en/releases/daily_builds.html
+
+chmod +x QGroundControl.AppImage 
+./QGroundControl.AppImage 
+
+open flightplan diamond_flight_plan.plan in the "plan" interface
+
+7.
+cd <PX4-Autopilot_clone>
+DONT_RUN=1 make px4_sitl_default gazebo-classic
+source Tools/simulation/gazebo-classic/setup_gazebo.bash $(pwd) $(pwd)/build/px4_sitl_default
+export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:$(pwd)
+export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:$(pwd)/Tools/simulation/gazebo-classic/sitl_gazebo-classic
+roslaunch px4 mavros_posix_sitl.launch
+
+8. to add noise 
+```
+cd ~/
+git clone git@github.com:yuyangch/ros_node_add_imu_noise.git
+cd ./ros_node_add_imu_noise
+mkdir build
+cd ./build
+cmake ..
+make
+cd ~/ros_node_add_imu_noise/build/devel/lib/add_noise_to_imu_msgs
+./add_noise_to_imu_msgs_node
+```
+
 
