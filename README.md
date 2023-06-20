@@ -231,8 +231,9 @@ into
 
 add rviz node 
 line 6 of ~/PX4-Autopilot/launch/mavros_posix_sitl.launch
+```
 <node type="rviz" name="rviz" pkg="rviz" args="-d $(find mavlink_sitl_gazebo)/dual_gt_estmated_odom_rviz.rviz" />
-
+```
 
 ![alt text](https://github.com/yuyangch/MEMS_Lidar_Mountable_Plugin/blob/main/rviz.png?raw=true)
 
