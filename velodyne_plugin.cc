@@ -1,3 +1,15 @@
+//This file relates to lidar universal joint/mems angular control
+//generate_lidar_scanning_pattern() generates scanning patern for update_current_rastor_z_scan(), which updates the next grid target
+//but the above behavior is only suitable for single beam MEMS configuration
+//the raztor z grid is currently set to a single point, for 360 scanning lidar configuration
+//    private: float angular_noise_std; controls the input noise
+// needs variable to decide control delay
+// to change range measurement noise, look at GazeboRosVelodyneLaser.cpp instead. check gaussian_noise_ variable
+//
+
+// the 
+
+
 #ifndef _VELODYNE_PLUGIN_HH_
 #define _VELODYNE_PLUGIN_HH_
 
@@ -89,9 +101,12 @@ namespace gazebo
         angular_noise_std = _sdf->Get<double>("GaussianNoise");
       else
         std::cout<<"lidar controller plugin lacks GaussianNoise parameter, defaults to 0.0"<<std::endl;
-
       distribution= new std::normal_distribution<double>(0,angular_noise_std);
       std::cout<<"distribution mean and stddev "<<distribution->mean()<<" "<<distribution->stddev()<<std::endl;
+ 
+      if (_sdf->HasElement("Delay_ms"))
+        delay = _sdf->Get<int>("Delay_ms");
+
       this->SetPosition(0.0,0.0);
 
       // Create the node
@@ -155,22 +170,48 @@ namespace gazebo
            elevation_control_input_setpoint=_msg->y;
 		       azimuth_control_input=_msg->z+(*distribution)(generator);
 		       elevation_control_input=_msg->y+(*distribution)(generator);
+           std::tuple<float,float,int> delay_queue_tuple;
+           float time =this->model->GetWorld()->SimTime ().Float();
+
+           int time_ms=static_cast<int>(time*1000);
+
+           delay_queue_tuple=std::make_tuple(azimuth_control_input,elevation_control_input,time_ms);
+           this->delay_queue.push(delay_queue_tuple);
+            // std::tuple<int,std::string> Three_d_value_tuple;
+            // two_d_key_tuple=std::make_tuple(cam_index,frame,gait_name);
+            // Three_d_value_tuple=std::make_tuple(frame,gait_name);
+
+
 	}
 
   // Called by the world update start event
   public: void OnUpdate()
   {
+
     // update position every 100 milliseconds
+    // 100 Hz MEMS MIRROR/Joint poistioin update
      float time =this->model->GetWorld()->SimTime ().Float();
      int time_ms=static_cast<int>(time*1000);
-     if (time_ms%10==0){
+     // if (!delay_mode){
+      if (time_ms%10==0){
         this->update_current_rastor_z_scan();
         std::cout<<"azimuth_control_input elevation_control_input"<< azimuth_control_input<<" "<<elevation_control_input<<std::endl;
         std::cout<<"azimuth_control_input elevation_control_input setpoints"<< azimuth_control_input_setpoint<<" "<<elevation_control_input_setpoint<<std::endl;
         std::cout<<"noise level "<<angular_noise_std<<std::endl;
         std::cout<<"distrubtion mean and std"<<distribution->mean()<<" "<<distribution->stddev()<<std::endl;
-        this->SetPosition((thx+azimuth_control_input)*M_PI/180.0,(thy+elevation_control_input)*M_PI/180.0);
-
+        std::cout<<"Delay_ms"<<delay<<std::endl;
+        //std::get<0>(Three_d_value_tuple);
+        while(!this->delay_queue.empty()){
+          int delay_queue_front_time=std::get<2>(this->delay_queue.front());
+          if (time_ms>(delay_queue_front_time+this->delay)){
+            float azimuth_control_delay_input=std::get<0>(this->delay_queue.front());
+            float elevation_control_delay_input=std::get<1>(this->delay_queue.front());
+            this->SetPosition((thx+azimuth_control_delay_input)*M_PI/180.0,(thy+elevation_control_delay_input)*M_PI/180.0);
+            this->delay_queue.pop();
+          }else{
+            break;
+          }
+        }
         geometry_msgs::Vector3Stamped v3s;
         
         v3s.header.stamp=ros::Time::now();
@@ -178,6 +219,9 @@ namespace gazebo
         v3s.vector.z=azimuth_control_input_setpoint;
         this->rosPub.publish(v3s);
      }
+     // }else{
+
+     // }
 
     //std::cout<<"time_ms is" <<time_ms<<std::endl;
 
@@ -266,6 +310,8 @@ namespace gazebo
     private: float angular_noise_std=0;
     private: std::default_random_engine generator;
     private: std::normal_distribution<double> *distribution;
+    private: int delay=0; //in ms
+    private: std::queue<std::tuple<float,float,int>> delay_queue;
 
     /// \brief A node used for transport
     private: transport::NodePtr node;

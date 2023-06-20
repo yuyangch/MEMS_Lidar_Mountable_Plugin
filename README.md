@@ -100,9 +100,25 @@ cd ./build
 The example code is in vel.cc, you can modify it 
 
 
+
+
+To change 2-axis input angular noise standard deviation(refer to world file line 26)
+```
+      <plugin name='velodyne_control' filename='libvelodyne_plugin.so'>
+        <GaussianNoise>0.0</GaussianNoise>
+      </plugin>
+```
+To change 2-axis input delay in ms (refer to world file line 26)
+```
+      <plugin name='velodyne_control' filename='libvelodyne_plugin.so'>
+        <Delay_ms>1000</Delay_ms>
+      </plugin>
+```
+
+
 ## Develop Code
 
-The current update rate is 100Hz both in dot switching(velodyne_plugin.cc:line 140) and lidar update 
+The current update rate is 100Hz both in dot switching(velodyne_plugin.cc:line 196) and lidar update 
 
 
 
