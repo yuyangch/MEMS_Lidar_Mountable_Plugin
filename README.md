@@ -33,7 +33,7 @@ https://classic.gazebosim.org/tutorials?tut=install_ubuntu
 
 ```
 cd ~/
-git clone https://github.com/droneslab/MEMS_Lidar_Gazebo_Plugin.git
+git clone https://github.com/yuyangch/MEMS_Lidar_Mountable_Plugin.git
 ```
 
 
@@ -42,13 +42,13 @@ add the sourcing lines to .bashrc  :
 echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
 ```
 ```bash
-echo "export GAZEBO_MODEL_PATH=${HOME}/MEMS_Lidar_Gazebo_Plugin:${GAZEBO_MODEL_PATH}" >> ~/.bashrc
-echo "export GAZEBO_PLUGIN_PATH=${HOME}/MEMS_Lidar_Gazebo_Plugin/build:${GAZEBO_PLUGIN_PATH}" >> ~/.bashrc
-echo "export GAZEBO_RESOURCE_PATH=${HOME}/MEMS_Lidar_Gazebo_Plugin:${GAZEBO_RESOURCE_PATH}" >> ~/.bashrc
+echo "export GAZEBO_MODEL_PATH=${HOME}/MEMS_Lidar_Mountable_Plugin:${GAZEBO_MODEL_PATH}" >> ~/.bashrc
+echo "export GAZEBO_PLUGIN_PATH=${HOME}/MEMS_Lidar_Mountable_Plugin/build:${GAZEBO_PLUGIN_PATH}" >> ~/.bashrc
+echo "export GAZEBO_RESOURCE_PATH=${HOME}/MEMS_Lidar_Mountable_Plugin:${GAZEBO_RESOURCE_PATH}" >> ~/.bashrc
 ```
 configure and run (standard cmake commands)
 ```
-cd ~/MEMS_Lidar_Gazebo_Plugin
+cd ~/MEMS_Lidar_Mountable_Plugin
 ./config.sh
 ./build.sh
 
@@ -58,7 +58,7 @@ cd ~/MEMS_Lidar_Gazebo_Plugin
 
 
 ## Usage
-in ~/MEMS_Lidar_Gazebo_Plugin
+in ~/MEMS_Lidar_Mountable_Plugin
 ```
 roslaunch l_gz.launch
 ```
@@ -188,8 +188,8 @@ Range: unlimited currently
 
 
 # Step 2 Install PX4-Gazebo Simulation Environment
+This is tested with Ubuntu 20.04, ROS noetic
 
-installation from new wesite 
 1.
 ```
 git clone https://github.com/PX4/PX4-Autopilot.git --recursive
@@ -233,14 +233,28 @@ chmod +x QGroundControl.AppImage
 open flightplan diamond_flight_plan.plan in the "plan" interface
 
 7.
+```
 cd <PX4-Autopilot_clone>
 DONT_RUN=1 make px4_sitl_default gazebo-classic
 source Tools/simulation/gazebo-classic/setup_gazebo.bash $(pwd) $(pwd)/build/px4_sitl_default
 export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:$(pwd)
 export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:$(pwd)/Tools/simulation/gazebo-classic/sitl_gazebo-classic
 roslaunch px4 mavros_posix_sitl.launch
+```
 
-8. to add noise 
+8.
+record flight data for modified LIO-SAM to process later
+```
+rosbag record -O flight63_diamondpattern_houses_angular_input_3_degree_360FOV_range_noise_0point008_inputnoise_0point3_delay_120ms.bag /body_pose_ground_truth /clock /gazebo_ros_imu /libgazebo_ros_velodyne_laser /MEMS_rotation
+```
+or record LIOSAM output
+```
+rosbag record -O FOV360_range_noise_0point08.bag /lio_sam/mapping/cloud_registered /lio_sam/feature/cloud_corner /lio_sam/feature/cloud_surface /lio_sam/deskew/cloud_deskewed /tf /lio_sam/mapping/odometry /odometry/imu /body_pose_ground_truth /clock 
+```
+
+9. to add noise when running LIO-SAM
+
+
 ```
 cd ~/
 git clone git@github.com:yuyangch/ros_node_add_imu_noise.git
@@ -254,3 +268,17 @@ cd ~/ros_node_add_imu_noise/build/devel/lib/add_noise_to_imu_msgs
 ```
 
 
+
+
+# STEP3: install modified LIO-SAM
+go to  https://github.com/yuyangch/Motion_Compensated_LIO-SAM
+
+you can modified weather to motion compensate or not in the last line of 
+```
+./config/params.yaml
+```
+
+you can publish random joint input angular commands with scripts in 
+```
+./scripts/rotation_publisher.py
+```
