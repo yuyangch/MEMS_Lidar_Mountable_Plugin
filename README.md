@@ -118,7 +118,16 @@ To change 2-axis input delay in ms (refer to world file line 26)
         <Delay_ms>1000</Delay_ms>
       </plugin>
 ```
-
+To change lidar ray range measurement noise change this term `<stddev>0.008</stddev>`
+```
+          <ray>
+            <noise>
+              <type>gaussian</type>
+              <mean>0</mean>
+              <stddev>0.008</stddev>
+            </noise>
+            <scan>
+```
 
 ## Develop Code
 
@@ -204,6 +213,8 @@ cd /path/to/PX4-Autopilot
 make px4_sitl gazebo-classic
 ```
 4. change world file
+
+![alt text](https://github.com/yuyangch/MEMS_Lidar_Mountable_Plugin/blob/main/lidar_mounted_drone.png?raw=true)
 copy world file 
 
 empty_with_houses_v4.world
@@ -223,7 +234,11 @@ line 6 of ~/PX4-Autopilot/launch/mavros_posix_sitl.launch
 <node type="rviz" name="rviz" pkg="rviz" args="-d $(find mavlink_sitl_gazebo)/dual_gt_estmated_odom_rviz.rviz" />
 
 
+![alt text](https://github.com/yuyangch/MEMS_Lidar_Mountable_Plugin/blob/main/rviz.png?raw=true)
+
 6. 
+
+
 install QGroundControl daily builds
 https://docs.qgroundcontrol.com/master/en/releases/daily_builds.html
 
@@ -231,7 +246,7 @@ chmod +x QGroundControl.AppImage
 ./QGroundControl.AppImage 
 
 open flightplan diamond_flight_plan.plan in the "plan" interface
-
+![alt text](https://github.com/yuyangch/MEMS_Lidar_Mountable_Plugin/blob/main/image1.png?raw=true)
 7.
 ```
 cd <PX4-Autopilot_clone>
@@ -281,4 +296,18 @@ you can modified weather to motion compensate or not in the last line of
 you can publish random joint input angular commands with scripts in 
 ```
 ./scripts/rotation_publisher.py
+```
+
+
+
+# Cite this work 
+if you use this code base please cite
+```
+@article{chen2023design,
+  title={Design of an Adaptive Lightweight LiDAR to Decouple Robot-Camera Geometry},
+  author={Chen, Yuyang and Wang, Dingkang and Thomas, Lenworth and Dantu, Karthik and Koppal, Sanjeev J},
+  journal={arXiv preprint arXiv:2302.14334},
+  year={2023}
+}
+
 ```
